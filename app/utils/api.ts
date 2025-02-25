@@ -1,32 +1,35 @@
 const API_URL = "https://jsonplaceholder.typicode.com/todos";
 
+export interface Task {
+  id: number;
+  title: string;
+  completed: boolean;
+  priority: "Low" | "Medium" | "High" | "Urgent";
+}
 
-export async function fetchTasks() {
+export const fetchTasks = async (): Promise<Task[]> => {
   const res = await fetch(API_URL);
   return res.json();
-}
+};
 
-export async function addTask(title: string) {
+export const addTask = async (title: string): Promise<Task> => {
   const res = await fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({ title, completed: false }),
     headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, completed: false }),
   });
   return res.json();
-}
+};
 
-export async function completeTask(id: number) {
+export const completeTask = async (id: number): Promise<Task> => {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
-    body: JSON.stringify({ completed: true }),
     headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ completed: true }),
   });
   return res.json();
-}
+};
 
-export async function deleteTask(id: number) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
-  return res.ok;
-}
+export const deleteTask = async (id: number): Promise<void> => {
+  await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+};

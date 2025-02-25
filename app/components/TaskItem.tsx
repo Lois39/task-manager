@@ -1,35 +1,57 @@
-interface TaskProps {
-  task: {
-    id: number;
-    title: string;
-    completed: boolean;
-  };
-  onComplete: (id: number) => void;
-  onDelete: (id: number) => void;
+import { Task } from "../utils/api";
+import { FaCheckCircle, FaRegCircle, FaTrash, FaCircle } from "react-icons/fa";
+
+interface TaskItemProps {
+  task: Task;
+  onComplete: () => void;
+  onDelete: () => void;
 }
 
-export default function TaskItem({ task, onComplete, onDelete }: TaskProps) {
+export default function TaskItem({ task, onComplete, onDelete }: TaskItemProps) {
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "Low":
+        return "bg-green-500 text-white";
+      case "Medium":
+        return "bg-blue-500 text-white";
+      case "High":
+        return "bg-orange-500 text-white";
+      case "Urgent":
+        return "bg-red-500 text-white";
+      default:
+        return "bg-gray-400 text-white";
+    }
+  };
+
   return (
-    <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg shadow-sm border">
-      <span className={`text-lg ${task.completed ? "line-through text-gray-500" : "text-gray-800"}`}>
-        {task.title}
-      </span>
-      <div className="flex gap-2">
-        {!task.completed && (
-          <button
-            onClick={() => onComplete(task.id)}
-            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
-          >
-            Complete
-          </button>
+    <tr className="border-b">
+      <td className="px-4 py-3">{task.title}</td>
+
+      {/* Status Column */}
+      <td className="px-4 py-3 flex items-center gap-2">
+        {task.completed ? (
+          <FaCheckCircle className="text-green-600" />
+        ) : (
+          <FaCircle className="text-gray-400" />
         )}
-        <button
-          onClick={() => onDelete(task.id)}
-          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-        >
-          Delete
+        <span className="font-medium">
+          {task.completed ? "Done" : "Pending"}
+        </span>
+      </td>
+
+      {/* Priority Column */}
+      <td className="px-4 py-3">
+        <span className={`px-2 py-1 rounded ${getPriorityColor(task.priority)}`}>
+          {task.priority}
+        </span>
+      </td>
+
+      {/* Action Buttons */}
+      <td className="px-4 py-3">
+        <button onClick={onDelete} className="text-red-600 hover:text-red-800">
+          <FaTrash />
         </button>
-      </div>
-    </div>
+      </td>
+    </tr>
   );
 }
