@@ -9,18 +9,11 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchTasks().then((data) => {
-      setTasks(
-        data.slice(0, 7).map((task) => ({
-          ...task,
-          priority: getRandomPriority(),
-        }))
-      );
-      setLoading(false);
-    });
+    refreshTasks();
   }, []);
 
   const refreshTasks = async () => {
+    setLoading(true);
     const data = await fetchTasks();
     setTasks(
       data.slice(0, 7).map((task) => ({
@@ -28,6 +21,21 @@ export default function Home() {
         priority: getRandomPriority(),
       }))
     );
+    setLoading(false);
+  };
+
+  const handleCompleteTask = async (id: number) => {
+    await completeTask(id);
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === id ? { ...task, completed: true } : task
+      )
+    );
+  };  
+
+  const handleDeleteTask = async (id: number) => {
+    await deleteTask(id);
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
   };
 
   const getRandomPriority = (): Task["priority"] => {
@@ -39,7 +47,6 @@ export default function Home() {
     <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold text-center mb-6">Task Manager</h1>
 
-      {/* Pass refreshTasks to AddTask */}
       <AddTask onTaskAdded={refreshTasks} />
 
       {loading ? (
@@ -56,7 +63,12 @@ export default function Home() {
           </thead>
           <tbody>
             {tasks.map((task) => (
-              <TaskItem key={task.id} task={task} onComplete={() => {}} onDelete={() => {}} />
+              <TaskItem
+                key={task.id}
+                task={task}
+                onComplete={() => handleCompleteTask(task.id)}
+                onDelete={() => handleDeleteTask(task.id)}
+              />
             ))}
           </tbody>
         </table>
